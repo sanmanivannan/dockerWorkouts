@@ -89,3 +89,14 @@ Commands:
   ls          List volumes
   prune       Remove all unused local volumes
   rm          Remove one or more volumes
+
+
+  ******************************************
+
+  getting a sheel inside a container 
+
+  docker container run -it (starts the new container interractively)
+
+  docker container exec -it (runs additional commands such as BASH on a existing container)
+
+  docker container run -it --name proxycontainer nginx bash

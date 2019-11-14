@@ -1,0 +1,13 @@
+docker network create <dudenetwork> //creating a new network called dudenetwork
+
+docker container run -d -network-alias search -network dudenetwork elasticsearch:2  //firstcontainer
+
+docker container run -d -network-alias search -network dudenetwork elasticsearch:2  //secondcontainer
+
+docker run alpine nslookup search --rm --net dudenetwork
+
+docker run --rm centos curl -s search:9200 --net dudenetwork
+
+docker container -f rm
+
+
