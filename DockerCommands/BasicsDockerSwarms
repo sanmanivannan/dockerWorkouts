@@ -8,11 +8,6 @@ To add a worker to this swarm, run the following command:
 
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 
-
-docker node ls
-
-
-
 docker service --help
 
 Create a new service/ Its equivalen to docker run command 
@@ -24,6 +19,117 @@ docker container ls -a //also list the new containers in the new service which w
 docker service ps <frosty_heryrovsky> 
 docker service update <service---name--nuiu4yx7bqn6> --replicas 3 //creating 3 more services(not containers)
 docker service rm -f <service.name/id>
+
+***************************************************************
+3-node swarm cluster
+we need to provision 3 machines on any cloud providers/on virtualbox
+name it as node1, node2, node3 and install docker on all the 3 nodes
+on node1- after installing docker, we need to enable docker swarms
+docker swarm init  //this will enable the docker swarm on the node1
+docker swarm init --advertise-addr <IP Address>  //to specify an ip address to the swarm
+Swarm initialized: current node (osk4typ508aip3c43v3c5zz1x) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-28tczmh7ghr3tb6bqelaxtrxhdx5ifhok07izh6brbcns8amso-auyow55qiqoh2n0qfyzsbc0gd 192.168.65.3:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+link other 2 nodes using the join-tokens commands mentioned above with the manager role assigned to all the node 
+docker node ls //will display all nodes on the swarm
+
+docker service create --replicas 3 alpine ping 8.8.8.8 
+
+************************************************************************************
+
+network driver overlay
+--driver overlay
+
+for this exercise we will use the same 3 node swarm cluster used on the previous excercise (all manager)
+
+docker network create --driver overlay <networkdrivername>
+
+docker network ls
+
+create the new postgres database service
+docker service create --name psql --network <networkdrivername> -e POSTGRESG_PASSWORD=password postgres
+
+create the new drupal service
+docker service create --name drupal --network <networkdrivername> -p 8181:80 drupal
+
+
+********************************************************************
+
+# Assignment: Create A Multi-Service Multi-Node Web App
+
+## Goal: create networks, volumes, and services for a web-based "cats vs. dogs" voting app.
+
+- See architecture.png in this directory for a basic diagram of how the 5 services will work
+- All images are on Docker Hub, so you should use editor to craft your commands locally, then paste them into swarm shell (at least that's how I'd do it)
+- a `backend` and `frontend` overlay network are needed. Nothing different about them other then that backend will help protect database from the voting web app. (similar to how a VLAN setup might be in traditional architecture)
+- The database server should use a named volume for preserving data. Use the new `--mount` format to do this: `--mount type=volume,source=db-data,target=/var/lib/postgresql/data`
+
+docker network create --driver overlay frontend
+docker network create --driver overlay backend
+
+
+### Services (names below should be service names)
+- vote
+    - dockersamples/examplevotingapp_vote:before
+    - web front end for users to vote dog/cat
+    - ideally published on TCP 80. Container listens on 80
+    - on frontend network
+    - 2+ replicas of this container
+
+docker service create --name vote -p 80:80 --repilicas 2 --network frontend dockersamples/examplevotingapp_vote:before
+
+
+- redis
+    - redis:3.2
+    - key/value storage for incoming votes
+    - no public ports
+    - on frontend network
+    - 1 replica NOTE VIDEO SAYS TWO BUT ONLY ONE NEEDED
+
+docker service create --name redis --network frontend redis:3.2
+
+- worker
+    - dockersamples/examplevotingapp_worker
+    - backend processor of redis and storing results in postgres
+    - no public ports
+    - on frontend and backend networks
+    - 1 replica
+
+docker service create --name worker --network frontend --network backend dockersamples/examplevotingapp_worker
+
+- db
+    - postgres:9.4
+    - one named volume needed, pointing to /var/lib/postgresql/data
+    - on backend network
+    - 1 replica
+
+docker service create --name db --network backend --mount type=volume,source=db-data,target=/var/lib/postgresql/data postgres:9.4
+
+
+- result
+    - dockersamples/examplevotingapp_result:before
+    - web app that shows results
+    - runs on high port since just for admins (lets imagine)
+    - so run on a high port of your choosing (I choose 5001), container listens on 80
+    - on backend network
+    - 1 replica
+
+docker service create --name results -p 5001:80 --network backend dockersamples/examplevotingapp_result:before
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,0 +1,17 @@
+Stacks: Production grade compose 
+
+Stacks accepts compose files as their declarative definition for services, network and volumes
+
+docker stack deploy   //command used to run the compose file rather than just using the docker service create.
+                      //similar to using the docker-compose up to run the dockercompose files rather than running the docker container run commands
+
+Note: Stack is only for ONE Swarm and not for many swarms
+
+Write all the stacks on a compose file, as we wrote earlier 
+
+name the file anything like <docker-app-stack.yml> file
+
+
+
+
+ 
