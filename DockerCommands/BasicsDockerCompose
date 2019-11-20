@@ -1,0 +1,7 @@
+ docker-compose up --help
+Builds, (re)creates, starts, and attaches to containers for a service.
+
+docker-compose down --help                                                                                                                                               Stops containers and removes containers, networks, volumes, and images
+created by `up`.
+
+

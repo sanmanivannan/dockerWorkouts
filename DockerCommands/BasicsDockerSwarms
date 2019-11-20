@@ -1,0 +1,31 @@
+docker swarm init
+
+Swarm initialized: current node (osk4typ508aip3c43v3c5zz1x) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-28tczmh7ghr3tb6bqelaxtrxhdx5ifhok07izh6brbcns8amso-auyow55qiqoh2n0qfyzsbc0gd 192.168.65.3:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+
+docker node ls
+
+
+
+docker service --help
+
+Create a new service/ Its equivalen to docker run command 
+
+docker service create alpine ping 8.8.8.8  //this command will create a new service 
+docker node ls  
+docker service ls     //list the new service which was created from the earlier command
+docker container ls -a //also list the new containers in the new service which was created from the earlier command
+docker service ps <frosty_heryrovsky> 
+docker service update <service---name--nuiu4yx7bqn6> --replicas 3 //creating 3 more services(not containers)
+docker service rm -f <service.name/id>
+
+
+
+
+
