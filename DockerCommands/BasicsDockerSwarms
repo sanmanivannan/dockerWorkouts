@@ -58,6 +58,18 @@ create the new drupal service
 docker service create --name drupal --network <networkdrivername> -p 8181:80 drupal
 
 
+Routing Mesh
+
+Routing mesh is like virtual internal network within the swarm, where the various node can talk btw
+Routing mesh also acts as the load balancer(stateless loadbalancer)
+
+docker service create --name search --replicas 3 -p 9200:9200 elasticsearch:2
+
+the above command will create 3 task of elastic search on the 3nodes which we had created earlier
+
+docker service ps - will list all the services running on the 3 nodes OSI Layer3(TCP), not Layer 4 (DNS)
+
+
 ********************************************************************
 
 # Assignment: Create A Multi-Service Multi-Node Web App
