@@ -1,0 +1,8 @@
+docker service update - Update a service
+
+https://docs.docker.com/engine/reference/commandline/service_update/
+
+docker service update [OPTIONS] SERVICE
+
+
+

@@ -1,0 +1,55 @@
+Docker Healthcheck
+
+supported by dockerfile, compose yml, docker run, swarm services
+
+It expects exit 0(Ok) or exit 1(error) 
+3 status: starting, healthy, unhealthy
+
+in docker run CLI (both run and swarm) 
+=======================================
+eg:1
+
+doker run \
+--health-cmd="curl -f localhost:9200/_cluster.health || false" \
+--health-timeout= DURATION (default:30seconds) \
+--health-interval= DURATION (default:30seconds) \
+--health-start-period= DURATION (default:0s)  \
+--health-retries=N (default: 3) \
+elasticsearch:2
+
+eg:2 postgres db(docker run)
+
+docker run --name pgdb --health-cmd="pg_isready -U postgres || exit 1" postgres
+
+(docker servcie)
+
+docker service create --name pgdb --health-cmd ="pg_isready -U postgres || exit 1" postgres
+
+
+on docker file
+===============
+Basic commands 
+HEALTHCHECK curl -f http://localhost/ ||false
+
+custom commands
+HEALTHCHECK --timeout= 2s --interval=3s --retries=3 curl -f http://localhost/ping ||exit 1  #for web app
+
+HEALTHCHECK --timeout= 2s --interval=3s --retries=3 CMD pd_isready -U postgres ||exit 1
+
+0n compose/stack file
+**********************
+
+version: 3
+services:
+ nginx:
+    image:nginx
+    healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost"]
+     interval: 30s
+     timeout: 30s
+     retries: 3
+     start_period: 3m  #will support only after compose version 3.4
+
+
+
+

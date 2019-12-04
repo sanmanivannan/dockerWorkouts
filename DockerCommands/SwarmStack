@@ -11,7 +11,64 @@ Write all the stacks on a compose file, as we wrote earlier
 
 name the file anything like <docker-app-stack.yml> file and run the below command
 
-docker stack deploy -c <docker-app-stack.yml> <namevoteapp>
+docker stack deploy -c <docker-app-stack.yml> <stackname>
+
+***************************************************************************
+
+Secrets Storage
+
+Easiest secure way to store the Secrets like usename, password, TLS certficate,SSH keys, and any data that we prefer not to shown to others
+
+Supports string and binary contents upto 500KB in size
+
+Keys are stored only on the manager nodes
+
+Secrets are stored on the swarm, then assigned to a service
+
+They look like a container but actually stored on the memory fs
+/run/secrets/<secrets-name>
+/run/secrets/<secrets-alias>
+
+Creating secrets file in 2 different ways
+1. by using the file upload
+docker secret create <name_psql_user> psql_user.txt
+
+2. by entering the details on the CLI
+echo "myPassword" | docker secret create <password_pql_pass> -
+
+Assigning the secret to the new service which we create
+docker service create --name psql --secret name_psql_user --secret password_pql_pass /
+-e POSTGRES_PASSWORD_FILE=/run/secret/<password_pql_pass>  /
+-e POSTGRES_USER_FILE=/run/secret/<name_psql_user> 
+
+
+Secret on swarm
+=================
+Just like previous example, we will create 2 txt files for user-name and password
+Along with that we will alos have the docker-compose.yml file in which we have below
+
+version: "3.1"   #secrets only on on v3.1 and above
+
+services:
+  psql:
+    image: postgres
+    secrets:
+      - psql_user
+      - psql_password
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/psql_password
+      POSTGRES_USER_FILE: /run/secrets/psql_user
+
+secrets:
+  psql_user:
+    file: ./psql_user.txt
+  psql_password:
+    file: ./psql_password.txt
+
+docker stack deploy -c docker-compose. yml <stackname>
+
+
+
 
 
 
